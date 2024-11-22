@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+    }
+    .container {
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .form-container {
+      margin-bottom: 20px;
+    }
+    .form-container input {
+      padding: 8px;
+      margin-right: 10px;
+    }
+    .form-container button {
+      padding: 8px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .form-container button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Painel Administrativo</h1>
+  </header>
+  <div class="container">
+    <div class="form-container">
+      <input type="text" id="name" placeholder="Nome">
+      <input type="text" id="phone" placeholder="Telefone">
+      <button onclick="addUser()">Adicionar Usuário</button>
+    </div>
+    <div class="form-container">
+      <input type="text" id="search" placeholder="Buscar por nome ou telefone" oninput="filterUsers()">
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="userTable"></tbody>
+    </table>
+  </div>
+  <script>
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+// Renderizar usuários na tabela
+function renderUsers() {
+  const userTable = document.getElementById("userTable");
+  userTable.innerHTML = "";
+
+  users.forEach((user, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${user.name}</td>
+      <td>${user.phone}</td>
+      <td>
+        <button onclick="editUser(${index})">Editar</button>
+        <button onclick="deleteUser(${index})">Deletar</button>
+      </td>
+    `;
+    userTable.appendChild(row);
+  });
+
+  localStorage.setItem("users", JSON.stringify(users));
+}
+
+// Adicionar novo usuário
+function addUser() {
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if (name && phone) {
+    users.push({ name, phone });
+    document.getElementById("name").value = "";
+    document.getElementById("phone").value = "";
+    renderUsers();
+  } else {
+    alert("Preencha todos os campos!");
+  }
+}
+
+// Editar usuário
+function editUser(index) {
+  const name = prompt("Digite o novo nome:", users[index].name);
+  const phone = prompt("Digite o novo telefone:", users[index].phone);
+
+  if (name && phone) {
+    users[index] = { name, phone };
+    renderUsers();
+  }
+}
+
+// Deletar usuário
+function deleteUser(index) {
+  if (confirm("Tem certeza que deseja deletar este usuário?")) {
+    users.splice(index, 1);
+    renderUsers();
+  }
+}
+
+// Filtrar usuários
+function filterUsers() {
+  const search = document.getElementById("search").value.toLowerCase();
+  const filteredUsers = users.filter(
+    (user) => user.name.toLowerCase().includes(search) || user.phone.includes(search)
+  );
+
+  const userTable = document.getElementById("userTable");
+  userTable.innerHTML = "";
+
+  filteredUsers.forEach((user, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${user.name}</td>
+      <td>${user.phone}</td>
+      <td>
+        <button onclick="editUser(${index})">Editar</button>
+        <button onclick="deleteUser(${index})">Deletar</button>
+      </td>
+    `;
+    userTable.appendChild(row);
+  });
+}
+
+// Inicializar a tabela
+renderUsers();
+
+  </script>
+</body>
+</html>
