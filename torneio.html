@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Usuário</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+    }
+
+    .container, #confirmationPage {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      display: none;
+    }
+
+    .container.active, #confirmationPage.active {
+      display: block;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #2575fc;
+      outline: none;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2575fc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #1a5cb0;
+    }
+
+    #confirmationPage p {
+      margin: 10px 0;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    #confirmationPage button {
+      width: 48%;
+      margin: 5px 1%;
+    }
+
+    #confirmationPage .confirm {
+      background-color: #4caf50;
+    }
+
+    #confirmationPage .cancel {
+      background-color: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <!-- Página de Cadastro -->
+  <div class="container active">
+    <h1>Cadastro de Usuário</h1>
+    <form id="userForm">
+      <label for="name">Nome:</label>
+      <input type="text" id="name" name="name" placeholder="Digite seu nome" required>
+      <small class="error" id="nameError">Nome inválido! Use apenas letras e espaços.</small>
+
+      <label for="phone">Número de Telefone:</label>
+      <input type="tel" id="phone" name="phone" placeholder="Digite apenas números" required>
+      <small class="error" id="phoneError">O telefone deve conter exatamente 11 dígitos.</small>
+
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+
+  <!-- Página de Confirmação -->
+  <div id="confirmationPage">
+    <h1>Confirmação</h1>
+    <p><strong>Nome:</strong> <span id="confirmName"></span></p>
+    <p><strong>Telefone:</strong> <span id="confirmPhone"></span></p>
+    <button class="confirm" id="confirmYes">Sim</button>
+    <button class="cancel" id="confirmNo">Não</button>
+  </div>
+
+  <script>
+    // Elementos DOM
+    const userForm = document.getElementById("userForm");
+    const confirmationPage = document.getElementById("confirmationPage");
+    const nameInput = document.getElementById("name");
+    const phoneInput = document.getElementById("phone");
+    const nameError = document.getElementById("nameError");
+    const phoneError = document.getElementById("phoneError");
+    const confirmName = document.getElementById("confirmName");
+    const confirmPhone = document.getElementById("confirmPhone");
+    const confirmYes = document.getElementById("confirmYes");
+    const confirmNo = document.getElementById("confirmNo");
+
+    let formData = {}; // Armazena dados temporariamente
+
+    // Funções de Validação
+    const isValidName = (name) => /^[a-zA-ZÀ-ÿ\s]+$/.test(name);
+    const isValidPhone = (phone) => /^\d{11}$/.test(phone); // Apenas 11 dígitos numéricos
+
+    // Manipulação do Formulário
+    userForm.addEventListener("submit", (e) => {
+      e.preventDefault(); // Evita o envio padrão
+
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      let isValid = true;
+
+      // Valida Nome
+      if (!isValidName(name)) {
+        nameError.style.display = "block";
+        isValid = false;
+      } else {
+        nameError.style.display = "none";
+      }
+
+      // Valida Telefone
+      if (!isValidPhone(phone)) {
+        phoneError.style.display = "block";
+        isValid = false;
+      } else {
+        phoneError.style.display = "none";
+      }
+
+      if (!isValid) return;
+
+      // Armazena os dados e exibe página de confirmação
+      formData = { name, phone };
+      confirmName.textContent = name;
+      confirmPhone.textContent = phone;
+
+      document.querySelector(".container").classList.remove("active");
+      confirmationPage.classList.add("active");
+    });
+
+    // Botão "Sim"
+    confirmYes.addEventListener("click", () => {
+      alert("Dados enviados com sucesso!");
+      console.log("Enviado ao servidor:", formData);
+
+      userForm.reset(); // Limpa o formulário
+      confirmationPage.classList.remove("active");
+      document.querySelector(".container").classList.add("active");
+    });
+
+    // Botão "Não"
+    confirmNo.addEventListener("click", () => {
+      nameInput.value = formData.name;
+      phoneInput.value = formData.phone;
+
+      confirmationPage.classList.remove("active");
+      document.querySelector(".container").classList.add("active");
+    });
+  </script>
+</body>
+</html>
